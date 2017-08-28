@@ -52,8 +52,8 @@ func main() {
 				 "Issuer Name Hash (SHA-256)",
 				 "Issuer Key Hash (SHA-256)",
 				 "Example Certificate Hash (SHA-256)",
-				 "Unexpired Certificate Serial Number",
-				 "Unexpired SHA-1 Certificate Serial Number",
+				 "Serial Number of Unexpired Certificate",
+				 "Serial Number of Unexpired SHA-1 Certificate",
 	})
 
 	for rows.Next() {
