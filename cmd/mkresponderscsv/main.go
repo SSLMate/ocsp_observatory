@@ -51,10 +51,11 @@ func main() {
 				 "Issuer Key Hash (SHA-1)",
 				 "Issuer Name Hash (SHA-256)",
 				 "Issuer Key Hash (SHA-256)",
+				 "Example Certificate Hash (SHA-256)",
 				 "Unexpired Certificate Serial Number",
-				 "Unexpired Certificate Hash (SHA-256)",
 				 "Unexpired SHA-1 Certificate Serial Number",
-				 "Unexpired SHA-1 Certificate Hash (SHA-256)"})
+	})
+
 	for rows.Next() {
 		var uri string
 		var issuerKeySha256 []byte
@@ -67,11 +68,17 @@ func main() {
 		var sha1CertSha256 []byte
 		var sha1CertSerialBytes []byte
 		var sha1CertExpiration *time.Time
+		var exampleCertSha256 []byte
 
 		if err := rows.Scan(&uri, &issuerKeySha256, &issuerNameSha256, &issuerKeySha1, &issuerNameSha1, &certSha256, &certSerialBytes, &certExpiration, &sha1CertSha256, &sha1CertSerialBytes, &sha1CertExpiration); err != nil {
 			log.Fatalf("Database error: %s", err)
 		}
 
+		if len(certSha256) > 0 {
+			exampleCertSha256 = certSha256
+		} else if len(sha1CertSha256) > 0 {
+			exampleCertSha256 = sha1CertSha256
+		}
 		if certExpiration != nil && certExpiration.Before(time.Now()) {
 			certSha256 = nil
 			certSerialBytes = nil
@@ -87,10 +94,9 @@ func main() {
 			hex.EncodeToString(issuerKeySha1),
 			hex.EncodeToString(issuerNameSha256),
 			hex.EncodeToString(issuerKeySha256),
+			hex.EncodeToString(exampleCertSha256),
 			serialToString(certSerialBytes),
-			hex.EncodeToString(certSha256),
 			serialToString(sha1CertSerialBytes),
-			hex.EncodeToString(sha1CertSha256),
 		}
 		csvwriter.Write(cols)
 	}
