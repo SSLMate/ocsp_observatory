@@ -13,6 +13,7 @@ import (
 	"crypto/sha1"
 	"crypto/sha256"
 	"database/sql"
+	"encoding/asn1"
 	"flag"
 	"fmt"
 	"log"
@@ -89,7 +90,10 @@ func examineCert(certBytes []byte, issuerBytes []byte) (*responderInfo, error) {
 		return nil, nil
 	}
 
-	info.certSerial = certTBS.SerialNumber.FullBytes
+	if !(certTBS.SerialNumber.Class == asn1.ClassUniversal && certTBS.SerialNumber.Tag == asn1.TagInteger) {
+		return nil, fmt.Errorf("Certificate has non-integer serial number: class %d, tag %d", certTBS.SerialNumber.Class, certTBS.SerialNumber.Tag)
+	}
+	info.certSerial = certTBS.SerialNumber.Bytes
 	validity, err := certTBS.ParseValidity()
 	if err != nil {
 		return nil, fmt.Errorf("Parsing certificate validity failed: %s", err)

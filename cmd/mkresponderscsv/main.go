@@ -10,8 +10,6 @@
 package main
 
 import (
-	"encoding/asn1"
-	"math/big"
 	"encoding/csv"
 	"encoding/hex"
 	"database/sql"
@@ -22,19 +20,6 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func serialToString(bytes []byte) string {
-	if len(bytes) == 0 {
-		return ""
-	}
-
-	serial := big.NewInt(0)
-	if rest, err := asn1.Unmarshal(bytes, &serial); err != nil {
-		log.Fatalf("Error parsing serial number: %s", err)
-	} else if len(rest) > 0 {
-		log.Fatalf("Error parsing serial number: trailing garbage: %v", rest)
-	}
-	return serial.Text(16)
-}
 func main() {
 	db, err := sql.Open("postgres", os.Getenv("OCSPOBSERVATORY_DB"))
 	if err != nil {
@@ -95,8 +80,8 @@ func main() {
 			hex.EncodeToString(issuerNameSha256),
 			hex.EncodeToString(issuerKeySha256),
 			hex.EncodeToString(exampleCertSha256),
-			serialToString(certSerialBytes),
-			serialToString(sha1CertSerialBytes),
+			hex.EncodeToString(certSerialBytes),
+			hex.EncodeToString(sha1CertSerialBytes),
 		}
 		csvwriter.Write(cols)
 	}
