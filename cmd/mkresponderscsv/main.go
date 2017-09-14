@@ -21,7 +21,7 @@ import (
 )
 
 func main() {
-	db, err := sql.Open("postgres", os.Getenv("OCSPOBSERVATORY_DB"))
+	db, err := sql.Open("postgres", os.Getenv("OCSP_OBSERVATORY_DB"))
 	if err != nil {
 		log.Fatalf("Error opening database: %s", err)
 	}
